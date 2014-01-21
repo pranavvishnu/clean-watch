@@ -1,5 +1,5 @@
 {
-    "versionLabel": "0.1",
+    "versionLabel": "0.2",
     "uuid": "ee991414-778b-4b6a-8001-e6f4865705fc",
     "appKeys": {},
     "longName": "Clean Watch",
@@ -16,22 +16,17 @@
         "media": [
             {
                 "type": "font",
-                "name": "FONT_HELVETICA_MEDIUM_24",
-                "file": "fonts/HelveticaNeue_Med.ttf"
-            },
-            {
-                "type": "font",
-                "name": "FONT_HELVETICA_MEDIUM_49",
-                "file": "fonts/HelveticaNeue_Med.ttf"
-            },
-            {
-                "type": "font",
-                "name": "FONT_HELVETICA_LIGHT_49",
+                "name": "FONT_HELVETICA_LIGHT_43",
                 "file": "fonts/HelveticaNeue_Lt.ttf"
             },
             {
                 "type": "font",
                 "name": "FONT_HELVETICA_LIGHT_18",
+                "file": "fonts/HelveticaNeue_Lt.ttf"
+            },
+            {
+                "type": "font",
+                "name": "FONT_HELVETICA_LIGHT_65",
                 "file": "fonts/HelveticaNeue_Lt.ttf"
             },
             {
