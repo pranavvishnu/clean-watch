@@ -6,8 +6,14 @@ TextLayer *text_min_layer;
 TextLayer *text_date_layer;
 TextLayer *text_day_layer;
 Layer *line_layer;
+Layer *box_layer;
 
 void line_layer_update_callback(Layer *layer, GContext* ctx) {
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
+}
+
+void box_layer_update_callback(Layer *layer, GContext* ctx) {
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
 }
@@ -45,12 +51,10 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 	  for (int i=0; i < l; i++){
 		  hour_text[i] = 0;
 	  }
-	  text_layer_set_text_alignment(text_hour_layer, GTextAlignmentRight);
       memmove(time_text, &time_text[1], sizeof(time_text) - 1);
 	  memmove(hour_text, &time_text[0], 1);
 	  memmove(min_text, &time_text[2], 2);
   } else{
-	  text_layer_set_text_alignment(text_hour_layer, GTextAlignmentCenter);
 	  memmove(hour_text, &time_text[0], 2);
 	  memmove(min_text, &time_text[3], 2);
   }
@@ -62,10 +66,12 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 void handle_deinit(void) {
 	
   tick_timer_service_unsubscribe();
-	window_destroy(window);
 	text_layer_destroy(text_date_layer);
 	text_layer_destroy(text_hour_layer);
 	text_layer_destroy(text_min_layer);
+	layer_destroy(line_layer);
+	layer_destroy(box_layer);
+	window_destroy(window);
 }
 
 void handle_init(void) {
@@ -86,18 +92,25 @@ void handle_init(void) {
   text_layer_set_font(text_date_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HELVETICA_LIGHT_18)));
   layer_add_child(window_layer, text_layer_get_layer(text_date_layer));
 	
+  //Box Layer
+	
+  GRect box_frame = GRect(0, 91, 144, 168-91);
+  box_layer = layer_create(box_frame);
+  layer_set_update_proc(box_layer, box_layer_update_callback);
+  layer_add_child(window_layer, box_layer);
+	
   //Hour Layer
-  text_hour_layer = text_layer_create(GRect(0, 91, 90, 168-91));
+  text_hour_layer = text_layer_create(GRect(0, 91, 80, 168-91));
   text_layer_set_text_color(text_hour_layer, GColorBlack);
-  text_layer_set_background_color(text_hour_layer, GColorWhite);
-	text_layer_set_text_alignment(text_hour_layer, GTextAlignmentCenter);
+  text_layer_set_background_color(text_hour_layer, GColorClear);
+	text_layer_set_text_alignment(text_hour_layer, GTextAlignmentRight);
   text_layer_set_font(text_hour_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HELVETICA_LIGHT_65)));
   layer_add_child(window_layer, text_layer_get_layer(text_hour_layer));
 
   //Minutes Layer
   text_min_layer = text_layer_create(GRect(90, 91, 144-90, 168-91));
   text_layer_set_text_color(text_min_layer, GColorBlack);
-  text_layer_set_background_color(text_min_layer, GColorWhite);
+  text_layer_set_background_color(text_min_layer, GColorClear);
 	text_layer_set_text_alignment(text_min_layer, GTextAlignmentCenter);
   text_layer_set_font(text_min_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HELVETICA_LIGHT_43)));
   layer_add_child(window_layer, text_layer_get_layer(text_min_layer));
