@@ -18,23 +18,28 @@ void box_layer_update_callback(Layer *layer, GContext* ctx) {
   graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
 }
 
+// Update Day and Date.
+void handle_day_tick(struct tm *tick_time, TimeUnits units_changed) {
+	static char date_text[] = "XXXXXXXXX 00";
+	static char day_text[] = "Mm";
+	int i;
+	
+  strftime(date_text, sizeof(date_text), "%B %e", tick_time);
+	for (i=0; date_text[i]; i++) {
+  		if(date_text[i]>='a' && date_text[i]<='z') date_text[i] -= 32;
+	}
+  text_layer_set_text(text_date_layer, date_text);
+  strftime(day_text, sizeof(day_text), "%a", tick_time);
+  text_layer_set_text(text_day_layer, day_text);
+}
 
+// Update Time.
 void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   // Need to be static because they're used by the system later.
     static char time_text[] = "00:00";
 	static char min_text[] = "  ";
 	static char hour_text[] = "  ";
-    static char date_text[] = "Xxxxxxxxx 00";
-	static char day_text[] = "Mm";
-	
 	char *time_format;
-
-
-  // TODO: Only update the date when it's changed.
-  strftime(date_text, sizeof(date_text), "%B %e", tick_time);
-  text_layer_set_text(text_date_layer, date_text);
-  strftime(day_text, sizeof(day_text), "%a", tick_time);
-  text_layer_set_text(text_day_layer, day_text);
 	
   if (clock_is_24h_style()) {
     time_format = "%R";
@@ -44,7 +49,7 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 
   strftime(time_text, sizeof(time_text), time_format, tick_time);
 
-  // Kludge to handle lack of non-padded hour format string
+  // Handle lack of non-padded hour format string
   // for twelve hour clock and split time into hours/mins.
   if (!clock_is_24h_style() && (time_text[0] == '0')) {
 	  int l = sizeof(hour_text)/sizeof(hour_text[0]);
@@ -123,17 +128,20 @@ void handle_init(void) {
   text_layer_set_font(text_day_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_HELVETICA_LIGHT_18)));
   layer_add_child(window_layer, text_layer_get_layer(text_day_layer));
 
+  //Line
   GRect line_frame = GRect(8, 38, 139, 2);
   line_layer = layer_create(line_frame);
   layer_set_update_proc(line_layer, line_layer_update_callback);
   layer_add_child(window_layer, line_layer);
 
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+  tick_timer_service_subscribe(DAY_UNIT, handle_day_tick);
 	
   // Avoids a blank screen on watch start.
   time_t now = time(NULL);
   struct tm *tick_time = localtime(&now);
   handle_minute_tick(tick_time, MINUTE_UNIT);
+  handle_day_tick(tick_time, DAY_UNIT);
   
 }
 
