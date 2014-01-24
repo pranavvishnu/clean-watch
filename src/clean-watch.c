@@ -18,8 +18,12 @@ void box_layer_update_callback(Layer *layer, GContext* ctx) {
   graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
 }
 
-// Update Day and Date.
-void handle_day_tick(struct tm *tick_time, TimeUnits units_changed) {
+
+
+// Update Time and date.
+void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
+	
+  //Handle Date
 	static char date_text[] = "XXXXXXXXX 00";
 	static char day_text[] = "Mm";
 	int i;
@@ -31,11 +35,8 @@ void handle_day_tick(struct tm *tick_time, TimeUnits units_changed) {
   text_layer_set_text(text_date_layer, date_text);
   strftime(day_text, sizeof(day_text), "%a", tick_time);
   text_layer_set_text(text_day_layer, day_text);
-}
-
-// Update Time.
-void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
-  // Need to be static because they're used by the system later.
+	
+  // Handle Time
     static char time_text[] = "00:00";
 	static char min_text[] = "  ";
 	static char hour_text[] = "  ";
@@ -70,7 +71,7 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
 
 void handle_deinit(void) {
 	
-  tick_timer_service_unsubscribe();
+    tick_timer_service_unsubscribe();
 	text_layer_destroy(text_date_layer);
 	text_layer_destroy(text_hour_layer);
 	text_layer_destroy(text_min_layer);
@@ -135,13 +136,11 @@ void handle_init(void) {
   layer_add_child(window_layer, line_layer);
 
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
-  tick_timer_service_subscribe(DAY_UNIT, handle_day_tick);
 	
   // Avoids a blank screen on watch start.
   time_t now = time(NULL);
   struct tm *tick_time = localtime(&now);
   handle_minute_tick(tick_time, MINUTE_UNIT);
-  handle_day_tick(tick_time, DAY_UNIT);
   
 }
 
