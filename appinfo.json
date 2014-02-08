@@ -23,6 +23,7 @@
             {
                 "type": "font",
                 "name": "FONT_HELVETICA_LIGHT_65",
+                "characterRegex": [0-9],
                 "file": "fonts/HelveticaNeue_Lt.ttf"
             },
             {
@@ -33,6 +34,7 @@
             {
                 "type": "font",
                 "name": "FONT_HELVETICA_LIGHT_43",
+                "characterRegex": [0-9],
                 "file": "fonts/HelveticaNeue_Lt.ttf"
             }
         ]
